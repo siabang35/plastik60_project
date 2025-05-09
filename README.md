@@ -73,8 +73,8 @@ User Interaction → Widgets → Services → API/Local Storage → Models → S
 ## 3. Project Structure
 
 The project follows a feature-based organization with clear separation of concerns:
-
-
+<pre lang="markdown">
+```plaintext
 lib/
 ├── main.dart                  # App entry point
 ├── app.dart                   # App configuration
@@ -116,7 +116,12 @@ lib/
     ├── order/                 # Order screens
     ├── profile/               # Profile screens
     └── settings/              # Settings screens
-\`\`\`
+```
+</pre>
+
+# Order screens
+
+
 
 ## 4. Core Components
 
