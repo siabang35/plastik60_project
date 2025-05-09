@@ -66,15 +66,14 @@ The application follows a clean architecture approach with a clear separation of
 
 ### 2.3 Architectural Flow
 
-\`\`\`
+<pre lang="markdown">
 User Interaction → Widgets → Services → API/Local Storage → Models → Services → Widgets
-\`\`\`
+</pre>
 
 ## 3. Project Structure
 
 The project follows a feature-based organization with clear separation of concerns:
 <pre lang="markdown">
-```plaintext
 lib/
 ├── main.dart                  # App entry point
 ├── app.dart                   # App configuration
@@ -116,7 +115,7 @@ lib/
     ├── order/                 # Order screens
     ├── profile/               # Profile screens
     └── settings/              # Settings screens
-```
+
 </pre>
 
 # Order screens
