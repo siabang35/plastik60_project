@@ -74,7 +74,7 @@ User Interaction → Widgets → Services → API/Local Storage → Models → S
 
 The project follows a feature-based organization with clear separation of concerns:
 
-\`\`\`
+
 lib/
 ├── main.dart                  # App entry point
 ├── app.dart                   # App configuration
