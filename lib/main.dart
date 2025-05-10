@@ -11,29 +11,28 @@ import 'package:plastik60_app/services/storage_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set preferred orientations
+  // Lock orientation
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Initialize services
+  // Initialize services that need async init
   final storageService = await StorageService().init();
   final authService = AuthService(storageService);
-  final productService = ProductService();
   final cartService = CartService(storageService);
-  final orderService = OrderService();
 
-  // Check if user is already logged in
+  // Optional: check if user is logged in
   await authService.checkAuth();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => authService),
-        ChangeNotifierProvider(create: (_) => productService),
-        ChangeNotifierProvider(create: (_) => cartService),
-        ChangeNotifierProvider(create: (_) => orderService),
+        Provider<StorageService>.value(value: storageService),
+        ChangeNotifierProvider<AuthService>.value(value: authService),
+        ChangeNotifierProvider<CartService>.value(value: cartService),
+        ChangeNotifierProvider<ProductService>(create: (_) => ProductService()),
+        ChangeNotifierProvider<OrderService>(create: (_) => OrderService()),
       ],
       child: const PlastikApp(),
     ),

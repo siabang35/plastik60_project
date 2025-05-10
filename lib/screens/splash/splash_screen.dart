@@ -43,33 +43,93 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController.forward();
 
-    _checkAuthAndNavigate();
+    // Delay sedikit untuk memastikan widget sudah terpasang sebelum navigasi
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthAndNavigate();
+    });
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      print("Mulai navigasi dari splash screen");
+      await Future.delayed(const Duration(seconds: 2));
 
-    if (!mounted) return;
+      // Metode 1: Menggunakan Provider (jika StorageService sudah terdaftar di Provider)
+      try {
+        final storageService = Provider.of<StorageService>(
+          context,
+          listen: false,
+        );
+        final authService = Provider.of<AuthService>(context, listen: false);
 
-    final storageService = Provider.of<StorageService>(context, listen: false);
-    final authService = Provider.of<AuthService>(context, listen: false);
+        print("Berhasil mendapatkan services dari Provider");
 
-    // Check if onboarding is completed
-    final onboardingCompleted =
-        await storageService.getBool(AppConstants.onboardingKey) ?? false;
+        final onboardingCompleted =
+            await storageService.getBool(AppConstants.onboardingKey) ?? false;
 
-    if (!onboardingCompleted) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-      return;
-    }
+        print("Onboarding completed: $onboardingCompleted");
 
-    // Check if user is authenticated
-    final isAuthenticated = await authService.checkAuth();
+        if (!onboardingCompleted) {
+          if (mounted) {
+            print("Navigasi ke onboarding");
+            Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+          }
+          return;
+        }
 
-    if (isAuthenticated) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-    } else {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+        final isAuthenticated = await authService.checkAuth();
+        print("Is authenticated: $isAuthenticated");
+
+        if (mounted) {
+          if (isAuthenticated) {
+            print("Navigasi ke home");
+            Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+          } else {
+            print("Navigasi ke login");
+            Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+          }
+        }
+      } catch (providerError) {
+        // Metode 2: Jika Provider gagal, gunakan dependency injection langsung
+        print("Error dengan Provider: $providerError");
+        print("Mencoba dengan dependency injection langsung");
+
+        final storageService = await StorageService().init();
+        final authService = AuthService(storageService);
+
+        final onboardingCompleted =
+            await storageService.getBool(AppConstants.onboardingKey) ?? false;
+
+        print("Onboarding completed (direct): $onboardingCompleted");
+
+        if (!onboardingCompleted) {
+          if (mounted) {
+            print("Navigasi ke onboarding (direct)");
+            Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
+          }
+          return;
+        }
+
+        final isAuthenticated = await authService.checkAuth();
+        print("Is authenticated (direct): $isAuthenticated");
+
+        if (mounted) {
+          if (isAuthenticated) {
+            print("Navigasi ke home (direct)");
+            Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+          } else {
+            print("Navigasi ke login (direct)");
+            Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+          }
+        }
+      }
+    } catch (e) {
+      print("Error dalam _checkAuthAndNavigate: $e");
+      // Fallback navigation jika terjadi error
+      if (mounted) {
+        print("Navigasi fallback ke login karena error");
+        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+      }
     }
   }
 
@@ -109,6 +169,19 @@ class _SplashScreenState extends State<SplashScreen>
                 AppConstants.logoWhitePath,
                 width: 200,
                 height: 200,
+                errorBuilder: (context, error, stackTrace) {
+                  print("Error loading logo: $error");
+                  return Container(
+                    width: 200,
+                    height: 200,
+                    color: Colors.white24,
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      size: 50,
+                      color: Colors.white,
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),

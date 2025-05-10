@@ -14,6 +14,7 @@ import 'package:plastik60_app/screens/order/order_detail_screen.dart';
 import 'package:plastik60_app/screens/profile/profile_screen.dart';
 import 'package:plastik60_app/screens/settings/settings_screen.dart';
 import 'package:plastik60_app/services/auth_service.dart';
+import 'package:plastik60_app/services/storage_service.dart';
 
 class AppRoutes {
   static final navigatorKey = GlobalKey<NavigatorState>();
@@ -45,16 +46,31 @@ class AppRoutes {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case register:
-        final authService = routeSettings.arguments as AuthService;
+        // Handle the case when AuthService is not provided
+        AuthService? authService;
+        try {
+          authService = routeSettings.arguments as AuthService?;
+        } catch (e) {
+          // If casting fails, authService will remain null
+        }
+
+        // If authService is null, create a new instance
+        authService ??= AuthService(StorageService());
+
         return MaterialPageRoute(
-          builder: (_) => RegisterScreen(authService: authService),
+          builder: (_) => RegisterScreen(authService: authService!),
         );
       case forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case productList:
-        final args = routeSettings.arguments as Map<String, dynamic>?;
+        Map<String, dynamic>? args;
+        try {
+          args = routeSettings.arguments as Map<String, dynamic>?;
+        } catch (e) {
+          args = {};
+        }
         return MaterialPageRoute(
           builder:
               (_) => ProductListScreen(
@@ -65,7 +81,12 @@ class AppRoutes {
               ),
         );
       case productDetail:
-        final productId = routeSettings.arguments as String;
+        String productId = '';
+        try {
+          productId = routeSettings.arguments as String;
+        } catch (e) {
+          // Handle the case when productId is not provided
+        }
         return MaterialPageRoute(
           builder: (_) => ProductDetailScreen(productId: productId),
         );
@@ -76,13 +97,18 @@ class AppRoutes {
       case orderHistory:
         return MaterialPageRoute(builder: (_) => const OrderHistoryScreen());
       case orderDetail:
-        final orderId = routeSettings.arguments as String;
+        String orderId = '';
+        try {
+          orderId = routeSettings.arguments as String;
+        } catch (e) {
+          // Handle the case when orderId is not provided
+        }
         return MaterialPageRoute(
           builder: (_) => OrderDetailScreen(orderId: orderId),
         );
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
-      case AppRoutes.settings: // gunakan konstanta class
+      case settings:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:
         return MaterialPageRoute(
