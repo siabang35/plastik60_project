@@ -57,30 +57,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Image.asset(
-                    AppConstants.logoPath,
-                    height: 100,
-                  ),
+                  Image.asset(AppConstants.logoPath, height: 100),
                   const SizedBox(height: 32),
                   const Text(
                     'Welcome Back',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     'Sign in to continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  
+
                   // Email field
                   CustomTextField(
                     controller: _emailController,
@@ -91,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: Validators.validateEmail,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Password field
                   CustomTextField(
                     controller: _passwordController,
@@ -114,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: Validators.validatePassword,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Remember me and Forgot password
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,14 +125,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamed(AppRoutes.forgotPassword);
+                          Navigator.of(
+                            context,
+                          ).pushNamed(AppRoutes.forgotPassword);
                         },
                         child: const Text('Forgot Password?'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Login button
                   CustomButton(
                     text: 'Login',
@@ -149,21 +142,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _login,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Error message
                   if (authService.error != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Text(
                         authService.error!,
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                        ),
+                        style: const TextStyle(color: Colors.red, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                  
+
                   // Register link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -171,7 +161,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text("Don't have an account?"),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamed(AppRoutes.register);
+                          final authService = Provider.of<AuthService>(
+                            context,
+                            listen: false,
+                          );
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.register,
+                            arguments: authService,
+                          );
                         },
                         child: const Text('Register'),
                       ),

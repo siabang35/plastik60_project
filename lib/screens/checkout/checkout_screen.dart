@@ -34,7 +34,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   // Checkout form data
   String _selectedPaymentMethod = 'bank_transfer';
   String _selectedShippingMethod = 'regular';
-  String _selectedCourier = 'jne'; // Default value, you can change this
+  final String _selectedCourier = 'jne'; // Default value, you can change this
 
   // Address form data
   final _nameController = TextEditingController();

@@ -14,7 +14,7 @@ class PlastikApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light, // Default to light theme
-      home: const SplashScreen(),
+      home: SplashScreen(),
       onGenerateRoute: AppRoutes.onGenerateRoute,
       navigatorKey: AppRoutes.navigatorKey,
     );

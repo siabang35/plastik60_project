@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+//import 'package:provider/provider.dart'; // Add this import
 import 'package:plastik60_app/config/constants.dart';
 import 'package:plastik60_app/config/routes.dart';
 import 'package:plastik60_app/services/auth_service.dart';
@@ -7,7 +8,7 @@ import 'package:plastik60_app/widgets/common/custom_button.dart';
 import 'package:plastik60_app/widgets/common/custom_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final AuthService authService; // Tambahkan ini
+  final AuthService authService;
 
   const RegisterScreen({super.key, required this.authService});
 
@@ -46,33 +47,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+      if (!mounted) return;
+
       setState(() {
         _isLoading = true;
       });
 
       try {
-        await _authService.register(
-          name: _nameController.text,
-          email: _emailController.text,
-          phone: _phoneController.text,
+        final result = await _authService.register(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          phone: _phoneController.text.trim(),
           password: _passwordController.text,
         );
 
-        if (mounted) {
+        if (!mounted) return;
+
+        // Check if registration was successful
+        if (result) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Registration successful! Please login.'),
             ),
           );
           Navigator.pushReplacementNamed(context, AppRoutes.login);
-        }
-      } catch (e) {
-        if (mounted) {
+        } else {
+          // Handle the case when registration returns false
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Registration failed: ${e.toString()}')),
+            SnackBar(
+              content: Text(
+                'Registration failed: ${_authService.error ?? "Unknown error"}',
+              ),
+            ),
           );
         }
+      } catch (e) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: ${e.toString()}')),
+        );
       } finally {
         if (mounted) {
           setState(() {
@@ -142,9 +157,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           : Icons.visibility_off,
                     ),
                     onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      }
                     },
                   ),
                 ),
@@ -166,9 +183,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           : Icons.visibility_off,
                     ),
                     onPressed: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      }
                     },
                   ),
                 ),
@@ -185,10 +204,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const Text('Already have an account?'),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.login,
-                        );
+                        if (mounted) {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.login,
+                          );
+                        }
                       },
                       child: const Text('Login'),
                     ),
